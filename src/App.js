@@ -1,32 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Line } from 'react-chartjs-2';
-import {
-  Chart,
-  LineController,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-} from 'chart.js';
+import {Chart,Title, Tooltip, Legend } from 'chart.js';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
-function StockChartPage({ stockCode }) {
+function StockChartPage({ stockCode, stockName }) {
   const [stockData, setStockData] = useState([]);
   const chartRef = useRef(null);
-
+  
   useEffect(() => {
     const fetchStockData = async () => {
       try {
-      const response = await fetch(`http://127.0.0.1:12345/getStockData?code=${stockCode}`);
-      const data = await response.json();
-      setStockData(data);
-    } catch (error) {
-      console.error('Failed to fetch stock data:', error);
-    }
-  };
+        const response = await fetch(`http://127.0.0.1:12345/getStockData?code=${stockCode}`);
+        const data = await response.json();
+        setStockData(data);
+      } catch (error) {
+        console.error('Failed to fetch stock data:', error);
+      }
+    };
 
     const stockDataTimer = setInterval(() => {
       fetchStockData();
@@ -40,7 +30,7 @@ function StockChartPage({ stockCode }) {
     };
   }, [stockCode]);
 
-  const renderChart = () => {
+  const renderChart=()=> {
     const chartData = {
       labels: stockData.map(dataPoint => dataPoint.label),
       datasets: [
@@ -75,7 +65,7 @@ function StockChartPage({ stockCode }) {
     };
 
     // 创建和渲染图表
-    const ctx = document.getElementById('stockChart');
+    const ctx = chartRef.current;
     if (ctx) {
       chartRef.current = new Chart(chartRef.current, {
         type: 'line',
@@ -83,18 +73,22 @@ function StockChartPage({ stockCode }) {
         options: chartOptions,
       });
     }
+    return (
+      <Line data={chartData} options={chartOptions} ref={chartRef} />
+    );
   };
 
   useEffect(() => {
-    renderChart();
+    renderChart()
   }, [stockData]);
 
   return (
     <div>
       <h1>股票行情图表</h1>
+      <h2>股票名称: {stockName}</h2>
       <div>
         {stockData.length > 0 ? (
-          <Line data={stockData} ref={chartRef} />
+          renderChart()
         ) : (
           <p>Loading stock data...</p>
         )}
@@ -109,24 +103,13 @@ function App() {
   const [password, setPassword] = useState('');
   const [loggedIn, setLoggedIn] = useState(false);
   const [marketData, setMarketData] = useState([]);
-  const [shanghaiStocks, setShanghaiStocks] = useState([]);
-  const [shenzhenStocks, setShenzhenStocks] = useState([]);
-  const [gemStocks, setGemStocks] = useState([]);
-  const [selectedStock, setSelectedStock] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
       const response = await fetch('http://127.0.0.1:12345/getMarketPrice');
       const data = await response.json();
 
-      const shanghaiStocks = data.filter(stock => stock.Code.startsWith('6'));
-      const shenzhenStocks = data.filter(stock => stock.Code.startsWith('0'));
-      const gemStocks = data.filter(stock => stock.Code.startsWith('3'));
-
       setMarketData(data);
-      setShanghaiStocks(shanghaiStocks);
-      setShenzhenStocks(shenzhenStocks);
-      setGemStocks(gemStocks);
     };
 
     const timer = setInterval(() => {
@@ -161,10 +144,7 @@ function App() {
     }
   };
 
-  return (    
-    //<Router>标签报错JSX expressions must have one parent element.
-    //<Router>标签只有一个父元素包裹。可以使用一个<div>元素或React的Fragment (<>...</>) 来包裹<Router>标签和其子元素。
-    <>
+  return (
     <Router>
       <div>
         {loggedIn ? (
@@ -179,88 +159,43 @@ function App() {
             <input type="password" placeholder="密码" value={password} onChange={e => setPassword(e.target.value)} />
             <button onClick={handleRegister}>注册</button>
             <button onClick={handleLogin}>登录</button>
-            {/* 其他功能组件 */}
-            <h2>大盘行情</h2>
-            <select value={selectedStock} onChange={e => setSelectedStock(e.target.value)}>
-              <option value="">全部</option>
-              <option value="shanghai">沪市</option>
-              <option value="shenzhen">深市</option>
-              <option value="gem">创业板</option>
-            </select>
-            <table>
-              <thead>
-                <tr>
-                  <th>代码</th>
-                  <th>名称</th>
-                  <th>最新价格</th>
-                  <th>当日涨跌幅</th>
-                  <th>当日涨跌价</th>
-                </tr>
-              </thead>
-              <tbody>
-                {selectedStock === '' ? (
-                  marketData.map(stock => (
-                    <tr key={stock.Code}>
-                      <td>{stock.Code}</td>
-                      <td>{stock.Name}</td>
-                      <td>{stock.Price}</td>
-                      <td>{stock.ChangePercent}</td>
-                      <td>{stock.ChangeAmount}</td>
-                      <td>
-                        <a href="/stock/{stock.Code}" target="_blank">查看图表</a>
-                      </td>
-                    </tr>
-                  ))
-                ) : selectedStock === 'shanghai' ? (
-                  shanghaiStocks.map(stock => (
-                    <tr key={stock.Code}>
-                      <td>{stock.Code}</td>
-                      <td>{stock.Name}</td>
-                      <td>{stock.Price}</td>
-                      <td>{stock.ChangePercent}</td>
-                      <td>{stock.ChangeAmount}</td>
-                      <td>
-                        <a href="/stock/{stock.Code}" target="_blank">查看图表</a>
-                      </td>
-                    </tr>
-                  ))
-                ) : selectedStock === 'shenzhen' ? (
-                  shenzhenStocks.map(stock => (
-                    <tr key={stock.Code}>
-                      <td>{stock.Code}</td>
-                      <td>{stock.Name}</td>
-                      <td>{stock.Price}</td>
-                      <td>{stock.ChangePercent}</td>
-                      <td>{stock.ChangeAmount}</td>
-                      <td>
-                        <a href="/stock/{stock.Code}" target="_blank">查看图表</a>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  gemStocks.map(stock => (
-                    <tr key={stock.Code}>
-                      <td>{stock.Code}</td>
-                      <td>{stock.Name}</td>
-                      <td>{stock.Price}</td>
-                      <td>{stock.ChangePercent}</td>
-                      <td>{stock.ChangeAmount}</td>
-                      <td>
-                        <a href="/stock/{stock.Code}" target="_blank">查看图表</a>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
           </div>
         )}
+
+        <Routes>
+          <Route path="/" element={<Home marketData={marketData} />} />
+          <Route path="/chart/:stockCode/:stockName" element={<StockChartPage />} />
+        </Routes>
       </div>
-      <Routes>
-        <Route path="/stock/:stockCode" element={<StockChartPage />} />
-      </Routes>
     </Router>
-  </>
+  );
+}
+
+function Home({ marketData }) {
+  return (
+    <div>
+      <h1>股票市场行情</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>股票代码</th>
+            <th>股票名称</th>
+            <th>股票价格</th>
+          </tr>
+        </thead>
+        <tbody>
+          {marketData.map(stock => (
+            <tr key={stock.Code}>
+              <td>{stock.Code}</td>
+              <td>
+                <Link to={`/chart/${stock.Code}/${stock.Name}`}>{stock.Name}</Link>
+              </td>
+              <td>{stock.Price}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
