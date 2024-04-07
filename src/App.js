@@ -19,10 +19,14 @@ function StockChartPage({ stockCode }) {
 
   useEffect(() => {
     const fetchStockData = async () => {
+      try {
       const response = await fetch(`http://127.0.0.1:12345/getStockData?code=${stockCode}`);
       const data = await response.json();
       setStockData(data);
-    };
+    } catch (error) {
+      console.error('Failed to fetch stock data:', error);
+    }
+  };
 
     const stockDataTimer = setInterval(() => {
       fetchStockData();
@@ -73,7 +77,7 @@ function StockChartPage({ stockCode }) {
     // 创建和渲染图表
     const ctx = document.getElementById('stockChart');
     if (ctx) {
-      chartRef.current = new Chart(ctx.current, {
+      chartRef.current = new Chart(chartRef.current, {
         type: 'line',
         data: chartData,
         options: chartOptions,
@@ -88,8 +92,14 @@ function StockChartPage({ stockCode }) {
   return (
     <div>
       <h1>股票行情图表</h1>
+      <div>
+        {stockData.length > 0 ? (
+          <Line data={stockData} ref={chartRef} />
+        ) : (
+          <p>Loading stock data...</p>
+        )}
+      </div>
       <Link to="/">返回</Link>
-      <canvas id="stockChart"></canvas>
     </div>
   );
 }
@@ -197,7 +207,7 @@ function App() {
                       <td>{stock.ChangePercent}</td>
                       <td>{stock.ChangeAmount}</td>
                       <td>
-                        <Link to={`/stock/${stock.Code}`}>查看曲线</Link>
+                        <a href="/stock/{stock.Code}" target="_blank">查看图表</a>
                       </td>
                     </tr>
                   ))
@@ -210,7 +220,7 @@ function App() {
                       <td>{stock.ChangePercent}</td>
                       <td>{stock.ChangeAmount}</td>
                       <td>
-                        <Link to={`/stock/${stock.Code}`}>查看曲线</Link>
+                        <a href="/stock/{stock.Code}" target="_blank">查看图表</a>
                       </td>
                     </tr>
                   ))
@@ -223,7 +233,7 @@ function App() {
                       <td>{stock.ChangePercent}</td>
                       <td>{stock.ChangeAmount}</td>
                       <td>
-                        <Link to={`/stock/${stock.Code}`}>查看曲线</Link>
+                        <a href="/stock/{stock.Code}" target="_blank">查看图表</a>
                       </td>
                     </tr>
                   ))
@@ -236,7 +246,7 @@ function App() {
                       <td>{stock.ChangePercent}</td>
                       <td>{stock.ChangeAmount}</td>
                       <td>
-                        <Link to={`/stock/${stock.Code}`}>查看曲线</Link>
+                        <a href="/stock/{stock.Code}" target="_blank">查看图表</a>
                       </td>
                     </tr>
                   ))
