@@ -8,6 +8,7 @@ function App() {
   const [password, setPassword] = useState('');
   const [loggedIn, setLoggedIn] = useState(false);
   const [marketData, setMarketData] = useState([]);
+  const [balance, setBalance] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,6 +29,25 @@ function App() {
       clearInterval(timer);
     };
   }, []);
+
+  const fetchBalance = async () => {
+    try {
+      const response = await fetch(`http://127.0.0.1:12345/getBalance?username=${username}`);
+      const data = await response.json();
+      setBalance(data);
+    } catch (error) {
+      console.error('获取账户余额失败：', error);
+    }
+  };
+
+  useEffect(() => {
+    if (loggedIn) {
+      fetchBalance();
+    } else {
+      // 如果未登录，重置余额
+      setBalance(null);
+    }
+  }, [loggedIn, username]);
 
   const handleRegister = async () => {
     const response = await fetch(`http://127.0.0.1:12345/regist?username=${username}&pwd=${password}`);
@@ -52,12 +72,22 @@ function App() {
     }
   };
 
+  const handleLogout = () => {
+    setLoggedIn(false);
+    setUsername('');
+    setPassword('');
+    console.log('已注销');
+  };
+
   return (
     <Router>
       <div>
         {loggedIn ? (
           <div>
             <h1>登录用户界面</h1>
+            <p>用户名: {username}</p>
+            <p>账户余额: {balance !== null ? (balance === -1 ? '用户不存在' : balance) : '加载中...'}</p>
+            <button onClick={handleLogout}>注销</button>
             {/* 其他功能组件 */}
           </div>
         ) : (
