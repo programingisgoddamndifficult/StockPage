@@ -1,122 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-// import { Line } from 'react-chartjs-2';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
-import {Chart, TimeScale,LinearScale} from 'chart.js';
-import 'chartjs-adapter-date-fns';
-
-Chart.register(TimeScale,LinearScale); 
-
-function StockChartPage() {
-  const { stockCode, stockName } = useParams();
-  const [stockData, setStockData] = useState([]);
-  const chartRef = useRef(null);
-
-  useEffect(() => {
-    let currentChartInstance = chartRef.current;
-
-    if (currentChartInstance) {
-      currentChartInstance.destroy();
-    }
-
-    const fetchStockData = async () => {
-      try {
-        if (!stockCode) {
-          console.log('Invalid stock code:', stockCode);
-          return;
-        }
-        const response = await fetch(`http://127.0.0.1:12345/getStockPrice?code=${stockCode}`);
-        const data = await response.json();
-        if (data && data.length > 0) {
-          const currentTimeInSeconds = Math.floor(Date.now() / 1000);
-          const newData = data.map((price, index) => ({
-            time: currentTimeInSeconds - (data.length - index - 1) * 5 *1000,
-            price: price
-          }));
-          setStockData(prevData => [...prevData, ...newData]);
-        } else {
-          console.error('获取的股票数据为空。');
-        }
-      } catch (error) {
-        console.error('获取股票数据失败：', error);
-      }
-    };
-
-    const stockDataTimer = setInterval(() => {
-      fetchStockData();
-    }, 5000);
-
-    fetchStockData();
-
-    return () => {
-      clearInterval(stockDataTimer);
-    };
-  }, [stockCode]);
-
-  useEffect(() => {
-    const ctx = document.getElementById('stock-chart');
-     // 检查是否已经存在图表实例，如果存在则销毁
-    if (chartRef.current) {
-      chartRef.current.destroy();
-    }
-
-    const newChartInstance = new Chart(ctx, {
-      type: 'line',
-      data: {
-        // 将时间转换为 Date 对象
-        labels: stockData.map(dataPoint => new Date(dataPoint.time)),
-        datasets: [{
-          label: '股票价格',
-          data: stockData.map(dataPoint => dataPoint.price),
-          borderColor: 'blue',
-          fill: false,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: {
-            type: 'time', // 修改为时间类型
-            time: {
-              unit: 'second' // 可以根据需要设置时间单位
-            },        
-            display: true,
-            title: {
-              display: true,
-              text: '时间',
-            },
-          },
-          y: {
-            display: true,
-            title: {
-              display: true,
-              text: '价格',
-            },
-          },
-        },
-      },
-    });
-
-    chartRef.current = newChartInstance;
-
-    return () => {
-       // 在组件卸载时销毁图表实例
-      newChartInstance.destroy();
-    };
-  }, [stockData]);
-
-  return (
-    <div>
-      <h1>股票行情图表</h1>
-      <h2>股票名称: {stockName}</h2>
-      <div>
-        <canvas id="stock-chart" />
-      </div>
-      <Link to="/">返回</Link>
-    </div>
-  );
-}
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './Home';
+import StockChartPage from './StockChartPage';
 
 function App() {
   const [username, setUsername] = useState('');
@@ -130,10 +15,8 @@ function App() {
         const response = await fetch('http://127.0.0.1:12345/getMarketPrice');
         const data = await response.json();
         setMarketData(data);
-        // console.log('Stock Data:', data);
-      }     
-      catch (error) {
-        console.error('获取股票数据失败：', error);//网页端f12查看控制台
+      } catch (error) {
+        console.error('获取股票数据失败：', error);
       }
     };
 
@@ -193,34 +76,6 @@ function App() {
         </Routes>
       </div>
     </Router>
-  );
-}
-
-function Home({ marketData }) {
-  return (
-    <div>
-      <h1>股票市场行情</h1>
-      <table>
-        <thead>
-          <tr>
-            <th>股票代码</th>
-            <th>股票名称</th>
-            <th>股票价格</th>
-          </tr>
-        </thead>
-        <tbody>
-          {marketData.map(stock => (
-            <tr key={stock.Code}>
-              <td>{stock.Code}</td>
-              <td>
-                <Link to={`/chart/${stock.Code}/${stock.Name}`}>{stock.Name}</Link>
-              </td>
-              <td>{stock.Price}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
   );
 }
 
