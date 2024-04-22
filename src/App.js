@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link} from 'react-router-dom';
 import Home from './Home';
 import StockChartPage from './StockChartPage';
+import Trading from './Trading';
 
 function App() {
   const [username, setUsername] = useState('');
@@ -88,7 +89,7 @@ function App() {
             <p>用户名: {username}</p>
             <p>账户余额: {balance !== null ? (balance === -1 ? '用户不存在' : balance) : '加载中...'}</p>
             <button onClick={handleLogout}>注销</button>
-            {/* 其他功能组件 */}
+            <Link to="/Trading"><button>交易</button></Link>
           </div>
         ) : (
           <div>
@@ -103,6 +104,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home marketData={marketData} />} />
           <Route path="/chart/:stockCode/:stockName" element={<StockChartPage />} />
+          <Route path="/Trading" element={<Trading />} />
         </Routes>
       </div>
     </Router>
