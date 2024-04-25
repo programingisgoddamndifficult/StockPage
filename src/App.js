@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Link} from 'react-router-dom';
 import Home from './Home';
 import StockChartPage from './StockChartPage';
 import Trading from './Trading';
+import Portfolio from './Portfolio';
+import TradeHistory from './TradeHistory';
 
 function App() {
   const [username, setUsername] = useState('');
@@ -90,6 +92,8 @@ function App() {
             <p>账户余额: {balance !== null ? (balance === -1 ? '用户不存在' : balance) : '加载中...'}</p>
             <button onClick={handleLogout}>注销</button>
             <Link to="/Trading"><button>交易</button></Link>
+            <Link to="/Portfolio"><button>查看持仓</button></Link>
+            <Link to="/TradeHistory"><button>交易记录</button></Link>
           </div>
         ) : (
           <div>
@@ -105,6 +109,8 @@ function App() {
           <Route path="/" element={<Home marketData={marketData} />} />
           <Route path="/chart/:stockCode/:stockName" element={<StockChartPage />} />
           <Route path="/Trading" element={<Trading />} />
+          <Route path="/Portfolio" element={<Portfolio username={username} marketData={marketData} />} />
+          <Route path="/TradeHistory" element={<TradeHistory username={username} />} />
         </Routes>
       </div>
     </Router>
