@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link} from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Home from './Home';
 import StockChartPage from './StockChartPage';
 import Trading from './Trading';
 import Portfolio from './Portfolio';
 import TradeHistory from './TradeHistory';
+import './App.css';
 
 function App() {
   const [username, setUsername] = useState('');
@@ -47,7 +48,6 @@ function App() {
     if (loggedIn) {
       fetchBalance();
     } else {
-      // 如果未登录，重置余额
       setBalance(null);
     }
   }, [loggedIn, username]);
@@ -84,24 +84,24 @@ function App() {
 
   return (
     <Router>
-      <div>
+      <div className="container">
         {loggedIn ? (
-          <div>
+          <div className="user-section">
             <h1>登录用户界面</h1>
             <p>用户名: {username}</p>
             <p>账户余额: {balance !== null ? (balance === -1 ? '用户不存在' : balance) : '加载中...'}</p>
             <button onClick={handleLogout}>注销</button>
-            <Link to="/Trading"><button>交易</button></Link>
-            <Link to="/Portfolio"><button>查看持仓</button></Link>
-            <Link to="/TradeHistory"><button>交易记录</button></Link>
+            <Link to="/Trading"><button className="nav-button">交易</button></Link>
+            <Link to="/Portfolio"><button className="nav-button">查看持仓</button></Link>
+            <Link to="/TradeHistory"><button className="nav-button">交易记录</button></Link>
           </div>
         ) : (
-          <div>
+          <div className="guest-section">
             <h1>游客界面</h1>
             <input type="text" placeholder="用户名" value={username} onChange={e => setUsername(e.target.value)} />
             <input type="password" placeholder="密码" value={password} onChange={e => setPassword(e.target.value)} />
-            <button onClick={handleRegister}>注册</button>
-            <button onClick={handleLogin}>登录</button>
+            <button onClick={handleRegister} className="auth-button">注册</button>
+            <button onClick={handleLogin} className="auth-button">登录</button>
           </div>
         )}
 
