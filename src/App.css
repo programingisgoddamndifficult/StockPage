@@ -1,14 +1,17 @@
 .container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+  /* max-width: 800px;
+  margin: 0 auto; */
+  height:auto;
+  display:flex;
 }
 
 .user-section, .guest-section {
+  /* vertical-align: middle; */
   background-color: #f5f5f5;
   border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
+  padding: 100px;
+  width: 300px; /* 左侧模块宽度 */
+  height:800px;
 }
 
 .user-section h1, .guest-section h1 {
@@ -50,4 +53,14 @@ input[type="text"], input[type="password"] {
 
 input[type="text"]::placeholder, input[type="password"]::placeholder {
   color: #999;
+}
+
+.content {
+  flex:1;
+  height:auto;
+  margin-left:50px;
+}
+
+.right-column {
+  width: 300px; /* 右侧登录模块宽度 */
 }
