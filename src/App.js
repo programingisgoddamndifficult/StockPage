@@ -22,6 +22,7 @@ function App() {
         const data = await response.json();
         if (initialMarketData.length === 0) {
           setInitialMarketData(data); // Record initial market data
+          console.log('Initial market data in app.js:', initialMarketData);
         }
         setMarketData(data);
       } catch (error) {
@@ -33,10 +34,12 @@ function App() {
       fetchData();
     }, 5000);
 
+    fetchData();
+
     return () => {
       clearInterval(timer);
     };
-  }, []);
+  }, [initialMarketData]);
 
   const fetchBalance = async () => {
     try {

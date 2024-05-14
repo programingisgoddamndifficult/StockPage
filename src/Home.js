@@ -4,13 +4,17 @@ import { Link } from 'react-router-dom';
 function Home() {
   const [marketData, setMarketData] = useState([]);
   const [filter, setFilter] = useState('all'); // 添加一个状态来表示过滤条件，默认为'all'
-  // const [initialMarketData, setInitialMarketData] = useState([]);
+  const [initialMarketData, setInitialMarketData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch('http://127.0.0.1:12345/getMarketPrice');
         const data = await response.json();
+        if (initialMarketData.length === 0) {
+          setInitialMarketData(data); // Record initial market data
+          console.log('Initial market data in home.js:', initialMarketData);
+        }
         setMarketData(data);
       } catch (error) {
         console.error('获取股票数据失败：', error);
@@ -21,10 +25,13 @@ function Home() {
       fetchData();
     }, 5000);
 
+    fetchData();
+
     return () => {
       clearInterval(timer);
     };
-  }, []);
+  }, [initialMarketData]);
+  //将 initialMarketData 定义在 useEffect 内部，并将其作为依赖项传递给 useEffect。这样可以确保每次 useEffect 运行时都能获取到最新的 initialMarketData 值。
 
   // 根据过滤条件筛选股票数据
   const filteredMarketData = marketData.filter(stock => {
@@ -42,6 +49,7 @@ function Home() {
   const calculateChange = (initialPrice, currentPrice) => {
     const change = currentPrice - initialPrice;
     const changePercentage = ((currentPrice - initialPrice) / initialPrice) * 100;
+    // console.log(change, changePercentage);
     return { change, changePercentage };
   };
 
@@ -73,8 +81,8 @@ function Home() {
                 <Link to={`/chart/${stock.Code}/${stock.Name}`}>{stock.Name}</Link>
               </td>
               <td>{stock.Price}</td>
-              {/* <td>{calculateChange(initialMarketData.find(data => data.Code === stock.Code).Price, stock.Price).changePercentage.toFixed(2)}%</td>
-              <td>{calculateChange(initialMarketData.find(data => data.Code === stock.Code).Price, stock.Price).change.toFixed(2)}</td> */}
+              <td>{calculateChange(initialMarketData.find(data => data.Code === stock.Code).Price, stock.Price).changePercentage.toFixed(2)}%</td>
+              <td>{calculateChange(initialMarketData.find(data => data.Code === stock.Code).Price, stock.Price).change.toFixed(2)}</td> 
             </tr>
           ))}
         </tbody>
