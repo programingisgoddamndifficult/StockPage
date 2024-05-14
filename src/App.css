@@ -35,13 +35,6 @@
   margin-right: 10px;
 }
 
-/* .nav-button {
-  background-color: #28a745;
-}
-
-.auth-button {
-  background-color: #17a2b8;
-} */
 
 input[type="text"], input[type="password"] {
   width: calc(100% - 20px);
@@ -63,4 +56,19 @@ input[type="text"]::placeholder, input[type="password"]::placeholder {
 
 .right-column {
   width: 300px; /* 右侧登录模块宽度 */
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+th {
+  background-color: #f2f2f2;
 }

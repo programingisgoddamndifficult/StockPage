@@ -13,12 +13,16 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [marketData, setMarketData] = useState([]);
   const [balance, setBalance] = useState(null);
+  const [initialMarketData, setInitialMarketData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch('http://127.0.0.1:12345/getMarketPrice');
         const data = await response.json();
+        if (initialMarketData.length === 0) {
+          setInitialMarketData(data); // Record initial market data
+        }
         setMarketData(data);
       } catch (error) {
         console.error('获取股票数据失败：', error);
@@ -82,36 +86,41 @@ function App() {
     console.log('已注销');
   };
 
+
   return (
     <Router>
       <div className="container">
-        {loggedIn ? (
-          <div className="user-section">
-            <h1>登录用户界面</h1>
-            <p>用户名: {username}</p>
-            <p>账户余额: {balance !== null ? (balance === -1 ? '用户不存在' : balance) : '加载中...'}</p>
-            <button onClick={handleLogout}>注销</button>
-            <Link to="/Trading"><button className="nav-button">交易</button></Link>
-            <Link to="/Portfolio"><button className="nav-button">查看持仓</button></Link>
-            <Link to="/TradeHistory"><button className="nav-button">交易记录</button></Link>
-          </div>
-        ) : (
-          <div className="guest-section">
-            <h1>游客界面</h1>
-            <input type="text" placeholder="用户名" value={username} onChange={e => setUsername(e.target.value)} />
-            <input type="password" placeholder="密码" value={password} onChange={e => setPassword(e.target.value)} />
-            <button onClick={handleRegister} className="auth-button">注册</button>
-            <button onClick={handleLogin} className="auth-button">登录</button>
-          </div>
-        )}
-
-        <Routes>
-          <Route path="/" element={<Home marketData={marketData} />} />
-          <Route path="/chart/:stockCode/:stockName" element={<StockChartPage />} />
-          <Route path="/Trading" element={<Trading />} />
-          <Route path="/Portfolio" element={<Portfolio username={username} marketData={marketData} />} />
-          <Route path="/TradeHistory" element={<TradeHistory username={username} />} />
-        </Routes>
+        <div className="login-section">
+          {loggedIn ? (
+            <div className="user-section">
+              <h1>登录用户界面</h1>
+              <p>用户名: {username}</p>
+              <p>账户余额: {balance !== null ? (balance === -1 ? '用户不存在' : balance) : '加载中...'}</p>
+              <button onClick={handleLogout}>注销</button>
+              <Link to="/Trading"><button className="nav-button">交易</button></Link>
+              <Link to="/Portfolio"><button className="nav-button">查看持仓</button></Link>
+              <Link to="/TradeHistory"><button className="nav-button">交易记录</button></Link>
+            </div>
+          ) : (
+            <div className="guest-section">
+              <h1>游客界面</h1>
+              <input type="text" placeholder="用户名" value={username} onChange={e => setUsername(e.target.value)} />
+              <input type="password" placeholder="密码" value={password} onChange={e => setPassword(e.target.value)} />
+              <button onClick={handleRegister} className="auth-button">注册</button>
+              <button onClick={handleLogin} className="auth-button">登录</button>
+            </div>
+          )}
+        </div>
+ 
+        <div className="content">
+          <Routes>
+            <Route path="/" element={<Home marketData={marketData}  initialMarketData={initialMarketData} />} />
+            <Route path="/chart/:stockCode/:stockName" element={<StockChartPage />} />
+            <Route path="/Trading" element={<Trading />} />
+            <Route path="/Portfolio" element={<Portfolio username={username} marketData={marketData} />} />
+            <Route path="/TradeHistory" element={<TradeHistory username={username} />} />
+          </Routes>
+        </div>
       </div>
     </Router>
   );

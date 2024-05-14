@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './App.css'; 
 
 function TradeHistory({ username }) {
   const [tradeRecords, setTradeRecords] = useState([]);
@@ -25,7 +26,6 @@ function TradeHistory({ username }) {
           <tr>
             <th>交易时间</th>
             <th>股票代码</th>
-            <th>股票名称</th>
             <th>交易方向</th>
             <th>交易金额</th>
             <th>交易数量</th>
@@ -35,8 +35,7 @@ function TradeHistory({ username }) {
           {tradeRecords.map((record, index) => (
             <tr key={index}>
               <td>{record.TradeTime}</td>
-              <td>{record.Code}</td>
-              <td>{/* 股票名称 */}</td>
+              <td>{record.Code}</td> 
               <td>{record.Direction === 0 ? '买入' : '卖出'}</td>
               <td>{record.KnockPrice * record.Amount}</td>
               <td>{record.Amount}</td>

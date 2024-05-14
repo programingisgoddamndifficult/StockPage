@@ -10,8 +10,11 @@ function Trading() {
 
   const handleTrade = async () => {
     try {
+      console.log('正在发送交易请求...');
       const response = await fetch(`http://127.0.0.1:12345/trade?username=${username}&code=${stockCode}&direction=${direction}&price=${price}&amount=${amount}`);
+      console.log('收到交易请求的响应:', response);
       const data = await response.json();
+      console.log('解析交易请求的响应数据:', data);
       setTradeStatus(data);
     } catch (error) {
       console.error('交易失败：', error);
@@ -46,7 +49,11 @@ function Trading() {
         <input type="text" value={amount} onChange={e => setAmount(e.target.value)} />
       </div>
       <button onClick={handleTrade}>提交交易</button>
-      <p>交易状态：{tradeStatus}</p>
+      {/* 根据交易状态显示相应的提示信息 */}
+      {tradeStatus === '委托成功' && <p>委托成功</p>}
+      {tradeStatus === '交易成功' && <p>交易成功</p>}
+      {tradeStatus === '废单' && <p>废单</p>}
+      {tradeStatus === '交易失败' && <p>交易失败</p>}
     </div>
   );
 }
