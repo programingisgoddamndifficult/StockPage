@@ -33,7 +33,10 @@ function StockChartPage() {
             time: currentTimeInSeconds - (data.length - index - 1) * 5 * 1000,
             price: price
           }));
-          setStockData(prevData => [...prevData, ...newData]);
+          setStockData(prevData => {
+            const updatedData = [...prevData, ...newData].slice(-10); // 仅保留最近的十个数据点
+            return updatedData;
+          });
         } else {
           console.error('获取的股票数据为空。');
         }
